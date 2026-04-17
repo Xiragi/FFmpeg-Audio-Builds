@@ -16,6 +16,10 @@ ffbuild_depends() {
     [[ $TARGET != winarm64 ]] && echo openmpt
     echo soxr
     echo twolame
+    echo gme
+    echo chromaprint
+    echo pulseaudio
+    echo openal
 
     echo rpath
 }
