@@ -65,3 +65,60 @@ jobs:
           name: ffmpeg-${{ steps.strs.outputs.artifact_slug }}
           overwrite: true
           path: artifacts/*
+
+  build_macos:
+    name: Test macOS Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15-intel, macos-14]
+        variant: [lgpl-audio]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install nasm yasm pkg-config lame opus libvorbis xz
+      - name: Clone FFmpeg
+        run: |
+          git clone --filter=blob:none --depth=1 https://github.com/FFmpeg/FFmpeg.git ffmpeg
+      - name: Build FFmpeg
+        run: |
+          BREW_PREFIX="$(brew --prefix)"
+          export PKG_CONFIG_PATH="$BREW_PREFIX/lib/pkgconfig"
+          export TARGET=macos
+          
+          cd ffmpeg
+          source ../variants/defaults-${{ matrix.variant }}.sh
+          
+          ./configure --prefix=../prefix \
+            --pkg-config-flags="--static" \
+            --extra-version="$(date +%Y%m%d)" \
+            --extra-cflags="-I$BREW_PREFIX/include" \
+            --extra-ldflags="-L$BREW_PREFIX/lib" \
+            $FF_CONFIGURE \
+            --pkg-config="pkg-config --static" \
+            --enable-static \
+            --disable-shared
+            
+          make -j$(sysctl -n hw.ncpu)
+          make install
+      - name: Package artifacts
+        run: |
+          OS_ARCH="$(uname -m)"
+          BUILD_NAME="ffmpeg-test-macos-${OS_ARCH}-${{ matrix.variant }}"
+          mkdir -p "pkgroot/$BUILD_NAME/bin"
+          cp prefix/bin/ffmpeg "pkgroot/$BUILD_NAME/bin/"
+          cp ffmpeg/COPYING.LGPLv3 "pkgroot/$BUILD_NAME/LICENSE.txt"
+          
+          mkdir artifacts
+          cd pkgroot
+          tar cJf "../artifacts/${BUILD_NAME}.tar.xz" "$BUILD_NAME"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ffmpeg-macos-${{ matrix.os }}-${{ matrix.variant }}
+          overwrite: true
+          path: artifacts/*

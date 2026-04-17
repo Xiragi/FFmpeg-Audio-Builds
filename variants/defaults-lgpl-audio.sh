@@ -14,6 +14,8 @@ FF_CONFIGURE="--enable-version3 --disable-gpl --disable-nonfree \
 
 if [[ $TARGET == win* ]]; then
     FF_CONFIGURE+=" --enable-schannel"
+elif [[ $TARGET == macos* ]]; then
+    FF_CONFIGURE+=" --enable-securetransport"
 else
     FF_CONFIGURE+=" --enable-openssl"
 fi

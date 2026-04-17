@@ -1,10 +1,10 @@
 # Automated FFmpeg Audio Builds
 
-Weekly automated LGPL audio-only FFmpeg binaries.
+Lightweight LGPL FFmpeg binaries for audio only.
 
 Designed for workloads that don't require video.
 
-Latest builds are available [here](https://github.com/Xiragi/FFmpeg-Audio-Builds/releases/tag/latest).
+Latest builds are build and released weekly [here](https://github.com/Xiragi/FFmpeg-Audio-Builds/releases/tag/latest).
 
 ## Supported platforms
 
@@ -12,6 +12,8 @@ Latest builds are available [here](https://github.com/Xiragi/FFmpeg-Audio-Builds
 - Windows ARM64
 - Linux x64
 - Linux ARM64
+- macOS x64
+- macOS ARM64(M series)
 
 ## Supported features
 
