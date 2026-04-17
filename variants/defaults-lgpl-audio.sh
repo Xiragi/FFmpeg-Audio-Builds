@@ -1,0 +1,6 @@
+FF_CONFIGURE="--enable-version3 --disable-debug --disable-encoders --disable-decoders --disable-muxers --disable-demuxers --disable-parsers --disable-protocols --disable-devices --disable-filters --disable-swscale --disable-avdevice --disable-network --disable-doc --disable-hwaccels --enable-encoder=aac,libmp3lame,libopus,libvorbis --enable-decoder=aac,libmp3lame,libopus,libvorbis --enable-muxer=adts,flac,mp3,ogg,opus --enable-demuxer=aac,flac,mp3,ogg,opus --enable-parser=aac,flac,mpegaudio,opus,vorbis --enable-protocol=file --enable-filter=aresample,aformat,anull"
+FF_CFLAGS=""
+FF_CXXFLAGS=""
+FF_LDFLAGS=""
+GIT_BRANCH="master"
+LICENSE_FILE="COPYING.LGPLv3"
