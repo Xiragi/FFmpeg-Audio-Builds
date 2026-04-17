@@ -1,68 +1,218 @@
-# FFmpeg Static Auto-Builds
+# Automated FFmpeg Audio Builds
 
-Static Windows (x86_64) and Linux (x86_64) Builds of ffmpeg master and latest release branch.
+Weekly automated LGPL audio-only FFmpeg binaries.
 
-Windows builds are targetting Windows 7 and newer, provided UCRT is installed.
-The minimum supported version is Windows 10 22H2, no guarantees on anything older.
+Designed for workloads that don't require video.
 
-Linux builds are targetting RHEL/CentOS 8 (glibc-2.28 + linux-4.18) and anything more recent.
+Latest builds are available [here](https://github.com/Xiragi/FFmpeg-Audio-Builds/releases/tag/latest).
 
-## Auto-Builds
+## Supported platforms
 
-Builds run daily at 12:00 UTC (or GitHubs idea of that time) and are automatically released on success.
+- Windows x64
+- Windows ARM64
+- Linux x64
+- Linux ARM64
 
-**Auto-Builds run ONLY for win(arm)64 and linux(arm)64. There are no win32/x86 auto-builds, though you can produce win32 builds yourself following the instructions below.**
+## Supported features
 
-### Release Retention Policy
+### Encoders
+- AAC
+- AC3
+- ALAC
+- AMR-NB / AMR-WB
+- APE
+- aptX / aptX HD
+- DCA
+- FLAC
+- G.722 / G.723.1 / G.726 / G.729
+- GSM
+- MP1 / MP2 / MP3
+- Musepack
+- Nellymoser
+- Opus
+- PCM formats
+- RealAudio formats
+- Shorten
+- SIPR / Sonic
+- TAK
+- TrueHD
+- TTA
+- Vorbis
+- WavPack
+- WMA
+- libmp3lame
+- libopus
+- libvorbis
 
-- The last build of each month is kept for two years.
-- The last 14 daily builds are kept.
-- The special "latest" build floats and provides consistent URLs always pointing to the latest build.
+### Decoders
+- AAC / AAC-LATM
+- AC3
+- ADPCM formats
+- ALAC
+- AMR-NB / AMR-WB
+- APE
+- aptX / aptX HD
+- ATRAC
+- Cook
+- DCA
+- DSF / DSD formats
+- FLAC
+- G.722 / G.723.1 / G.726 / G.729
+- GSM
+- MP1 / MP2 / MP3
+- Musepack
+- Nellymoser
+- Opus
+- PCM formats
+- QCELP
+- RealAudio formats
+- Shorten
+- SIPR / Sonic
+- TAK
+- TrueHD
+- TTA
+- Vorbis
+- WavPack
+- WMA
+- IAMF
 
-## Package List
+### Muxers
+- ADTS
+- AIFF
+- AMR
+- AU
+- CAF
+- FLAC
+- IAMF
+- MP2 / MP3
+- MP4 / M4A
+- OGG
+- Opus
+- PCM formats
+- TTA
+- WAV
+- WavPack
+- RTP / RTSP / HLS / DASH
 
-For a list of included dependencies check the scripts.d directory.
-Every file corresponds to its respective package.
+### Demuxers
+- AAC, AC3, ADP, ADX
+- AEA, AFC, AIFF, AMR
+- AMR-NB / AMR-WB
+- ANM, APC, APE
+- ASF, AU, AVS
+- CAF, DAUD
+- DSF / DFF
+- DTS / DTS-HD
+- DV
+- EA
+- FLAC
+- GSM
+- HLS
+- IAMF
+- IFF, IT, ILBC
+- LOAS, LRC
+- Matroska
+- MM, MMF
+- MOV / MP4
+- MP3
+- MPC / MPC8
+- MXF
+- NUT
+- OGG, OMA
+- PCM formats
+- QCP
+- RealMedia
+- RTP / RTSP
+- SBC, SBG
+- SDX / SDS / SIF / SLN / SOX
+- SPDIF
+- TAK
+- TrueHD
+- TTA
+- VOC / VQF
+- W64 / WAV / WavPack
+- WSAUD / WSD / WTV
+- WV
+- XA / XMV / XVAG / XWMA
 
-## How to make a build
+### Parsers
+- AAC
+- AC3
+- ADPCM
+- ALAC
+- AMR
+- APE
+- Cook
+- DCA
+- DVAudio
+- FLAC
+- GSM
+- MP3
+- Opus
+- PCM
+- Vorbis
 
-### Prerequisites
+### Filters
+- aresample
+- aformat
+- anull
+- volume
+- pan
+- amerge
+- asplit
+- atempo
+- equalizer
+- bass
+- treble
+- compand
+- flanger
+- chorus
+- echo
+- reverb
+- silencedetect
+- ebur128
+- agate
+- alimiter
+- acompressor
+- sidechaincompress
+- sidechaingate
+- apulsator
+- atrim
+- asetpts
+- adelay
+- apad
+- asendcmd
+- acrossfade
+- afade
+- aloop
+- asettb
+- ashowinfo
+- amovie
+- abuffer
+- abuffersink
+- aiir
+- asupercut
+- asuperpass
+- asubboost
+- asubcut
+- aspectrogram
+- astats
+- avectorscope
+- aphasemeter
 
-* bash
-* docker
-
-### Build Image
-
-* `./makeimage.sh target variant [addin [addin] [addin] ...]`
-
-### Build FFmpeg
-
-* `./build.sh target variant [addin [addin] [addin] ...]`
-
-On success, the resulting zip file will be in the `artifacts` subdir.
-
-### Targets, Variants and Addins
-
-Available targets:
-* `win64` (x86_64 Windows)
-* `win32` (x86 Windows)
-* `linux64` (x86_64 Linux, glibc>=2.28, linux>=4.18)
-* `linuxarm64` (arm64 (aarch64) Linux, glibc>=2.28, linux>=4.18)
-
-The linuxarm64 target will not build some dependencies due to lack of arm64 (aarch64) architecture support or cross-compiling restrictions.
-
-* `davs2` and `xavs2`: aarch64 support is broken.
-* `libmfx` and `libva`: Library for Intel QSV, so there is no aarch64 support.
-
-Available variants:
-* `gpl` Includes all dependencies, even those that require full GPL instead of just LGPL.
-* `lgpl` Lacking libraries that are GPL-only. Most prominently libx264 and libx265.
-* `nonfree` Includes fdk-aac in addition to all the dependencies of the gpl variant.
-* `gpl-shared` Same as gpl, but comes with the libav* family of shared libs instead of pure static executables.
-* `lgpl-shared` Same again, but with the lgpl set of dependencies.
-* `nonfree-shared` Same again, but with the nonfree set of dependencies.
-
-All of those can be optionally combined with any combination of addins:
-* `4.4`/`5.0`/`5.1`/`6.0`/`6.1`/`7.0`/`7.1` to build from the respective release branch instead of master.
-* `debug` to not strip debug symbols from the binaries. This increases the output size by about 250MB.
-* `lto` build all dependencies and ffmpeg with -flto=auto (HIGHLY EXPERIMENTAL, broken for Windows, sometimes works for Linux)
+### Protocols
+- file
+- http
+- https
+- tcp
+- udp
+- rtp
+- rtsp
+- hls
+- tls
+- rtmp
+- rtmpe
+- rtmps
+- rtmpt
+- rtmpte
+- pipe
