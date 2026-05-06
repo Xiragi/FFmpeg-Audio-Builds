@@ -38,13 +38,15 @@ while [[ $# -gt 0 ]]; do
         INAME="$(echo ffmpeg-*)"
         TAGNAME="$(cut -d- -f2 <<<"$INAME")"
 
-        if [[ $TAGNAME == N ]]; then
+        if [[ $TAGNAME == N || $TAGNAME == git ]]; then
             TAGNAME="master"
         elif [[ $TAGNAME == n* ]]; then
             TAGNAME="$(sed -re 's/([0-9]+\.[0-9]+).*/\1/' <<<"$TAGNAME")"
         fi
 
-        if [[ "$INAME" =~ -[0-9]+-g ]]; then
+        if [[ "$INAME" =~ (-(win|linux|macos)[0-9]*.*)$ ]]; then
+            ONAME="ffmpeg-$TAGNAME-latest${BASH_REMATCH[1]}"
+        elif [[ "$INAME" =~ -[0-9]+-g ]]; then
             ONAME="ffmpeg-$TAGNAME-latest-$(cut -d- -f5- <<<"$INAME")"
         else
             ONAME="ffmpeg-$TAGNAME-latest-$(cut -d- -f3- <<<"$INAME")"
