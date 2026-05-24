@@ -12,6 +12,7 @@ ffbuild_depends() {
     echo libvorbis
     echo libmp3lame
     echo libopus
+    echo libxml2
     echo opencore-amr
     [[ $TARGET != winarm64 ]] && echo openmpt
     echo soxr
