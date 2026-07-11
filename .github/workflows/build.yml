@@ -404,18 +404,8 @@ jobs:
           RELDATE="$(date +'%Y-%m-%d %H:%M')"
           NAME="Auto-Build $RELDATE"
           TAGNAME="autobuild-$(date +'%Y-%m-%d-%H-%M')"
-          
-          mkdir standardized_artifacts
-          ./util/repack_latest.sh standardized_artifacts artifacts/*.{zip,tar.xz}
-          
-          for f in standardized_artifacts/*.{zip,tar.xz}; do
-            BN="$(basename "$f")"
-            PLATFORM_VARIANT="$(echo "$BN" | sed -re 's/ffmpeg-[^-]+-latest-(.*)\.(zip|tar\.xz)/\1/')"
-            echo "$BN" > "artifacts/${PLATFORM_VARIANT}.txt"
-          done
-          
-          (cd standardized_artifacts && sha256sum *.{zip,tar.xz} > checksums.sha256)
-          gh release create "$TAGNAME" --target "master" --title "$NAME" standardized_artifacts/*
+          (cd artifacts && sha256sum *.{zip,tar.xz} > checksums.sha256)
+          gh release create "$TAGNAME" --target "master" --title "$NAME" artifacts/*.{zip,tar.xz} artifacts/checksums.*
           echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
           echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
         env:
@@ -424,11 +414,21 @@ jobs:
         run: |
           set -xe
           shopt -s nullglob
+          mkdir latest_artifacts
+          ./util/repack_latest.sh latest_artifacts artifacts/*.{zip,tar.xz}
+          
+          for f in latest_artifacts/*.{zip,tar.xz}; do
+            BN="$(basename "$f")"
+            PLATFORM_VARIANT="$(echo "$BN" | sed -re 's/ffmpeg-[^-]+-latest-(.*)\.(zip|tar\.xz)/\1/')"
+            echo "$BN" > "artifacts/${PLATFORM_VARIANT}.txt"
+          done
+          
+          (cd latest_artifacts && sha256sum *.{zip,tar.xz} > checksums.sha256)
           NAME="Latest Auto-Build (${{ steps.create_release.outputs.rel_date }})"
           TAGNAME="latest"
           gh release delete --cleanup-tag --yes "$TAGNAME" || true
           sleep 15
-          gh release create "$TAGNAME" --target "master" --title "$NAME" standardized_artifacts/*
+          gh release create "$TAGNAME" --target "master" --title "$NAME" latest_artifacts/*
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Update Wiki
