@@ -382,7 +382,7 @@ jobs:
 
   publish_release:
     name: Publish release
-    if: ${{ !cancelled() && ( github.event_name == 'schedule' || github.event.inputs.doRelease == 'true' ) && (needs.build_ffmpeg.result == 'success' || needs.build_macos.result == 'success') }}
+    if: ${{ !cancelled() && ( github.event_name == 'schedule' || github.event.inputs.doRelease == 'true' ) && needs.build_ffmpeg.result == 'success' && needs.build_macos.result == 'success' }}
     needs: [build_ffmpeg, build_macos]
     runs-on: ubuntu-latest
     steps:
