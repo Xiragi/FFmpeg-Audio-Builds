@@ -148,6 +148,15 @@ jobs:
           - runner: ubuntu-24.04-arm
             target: linuxarm64
             tag_suffix: -arm
+          - runner: ubuntu-24.04-arm
+            target: linuxppc64
+            tag_suffix: -arm
+          - runner: ubuntu-24.04-arm
+            target: linuxmips64
+            tag_suffix: -arm
+          - runner: ubuntu-24.04-arm
+            target: linuxriscv64
+            tag_suffix: -arm
     steps:
       - name: Free Disk-Space
         run: df -h && sudo apt-get clean && docker system prune -a -f && sudo rm -rf /opt/ghc /usr/local/.ghcup /usr/local/lib/android && df -h
@@ -414,15 +423,15 @@ jobs:
         run: |
           set -xe
           shopt -s nullglob
-          mkdir latest_artifacts
-          ./util/repack_latest.sh latest_artifacts artifacts/*.{zip,tar.xz}
+          mkdir latest_artifacts worktmpdir
+          sudo mount -o size=75%,uid="${UID}" -t tmpfs tmpfs ./worktmpdir
+          (cd worktmpdir && ../util/repack_latest.sh ../latest_artifacts ../artifacts/*.{zip,tar.xz})
           
           for f in latest_artifacts/*.{zip,tar.xz}; do
             BN="$(basename "$f")"
             PLATFORM_VARIANT="$(echo "$BN" | sed -re 's/ffmpeg-[^-]+-latest-(.*)\.(zip|tar\.xz)/\1/')"
             echo "$BN" > "artifacts/${PLATFORM_VARIANT}.txt"
           done
-          
           (cd latest_artifacts && sha256sum *.{zip,tar.xz} > checksums.sha256)
           NAME="Latest Auto-Build (${{ steps.create_release.outputs.rel_date }})"
           TAGNAME="latest"
