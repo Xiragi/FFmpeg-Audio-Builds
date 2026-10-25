@@ -322,57 +322,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Install dependencies
+      - name: Install native build tools
         run: |
-          brew update
-          brew install nasm yasm pkg-config lame opus libvorbis xz
-      - name: Clone FFmpeg
-        run: |
-          git clone --filter=blob:none --depth=1 https://github.com/FFmpeg/FFmpeg.git ffmpeg
-      - name: Build FFmpeg
-        run: |
-          BREW_PREFIX="$(brew --prefix)"
-          export PKG_CONFIG_PATH="$BREW_PREFIX/lib/pkgconfig"
-          export TARGET=macos
-          
-          cd ffmpeg
-          source ../variants/defaults-${{ matrix.variant }}.sh
-          
-          ./configure --prefix=../prefix \
-            --pkg-config-flags="--static" \
-            --extra-version="$(date +%Y%m%d)" \
-            --extra-cflags="-I$BREW_PREFIX/include" \
-            --extra-ldflags="-L$BREW_PREFIX/lib" \
-            $FF_CONFIGURE \
-            --pkg-config="pkg-config --static" \
-            --enable-static \
-            --disable-shared
-            
-          make -j$(sysctl -n hw.ncpu)
-          make install
-          
-          echo "Binary Size:"
-          du -h ../prefix/bin/ffmpeg
-          ../prefix/bin/ffmpeg -version
-      - name: Package artifacts
-        run: |
-          OS_ARCH="$(uname -m)"
-          # Align TARGET name with Win/Linux convention
-          if [[ "$OS_ARCH" == "x86_64" ]]; then
-            TARGET_NAME="macos64"
-          else
-            TARGET_NAME="macosarm64"
-          fi
-          
-          BUILD_NAME="ffmpeg-$(./ffmpeg/ffbuild/version.sh ./ffmpeg)-${TARGET_NAME}-${{ matrix.variant }}"
-          mkdir -p "pkgroot/$BUILD_NAME/bin"
-          cp prefix/bin/ffmpeg "pkgroot/$BUILD_NAME/bin/"
-          cp ffmpeg/COPYING.LGPLv3 "pkgroot/$BUILD_NAME/LICENSE.txt"
-          
-          mkdir artifacts
-          cd pkgroot
-          tar cJf "../artifacts/${BUILD_NAME}.tar.xz" "$BUILD_NAME"
-          echo "${BUILD_NAME}.tar.xz" > "../artifacts/${TARGET_NAME}-${{ matrix.variant }}.txt"
+          brew install bash coreutils gnu-sed make bison texinfo gettext autoconf automake libtool cmake nasm subversion pkgconf
+      - name: Build and audit macOS artifacts
+        run: '"$(brew --prefix bash)/bin/bash" util/build_macos.sh'
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:

@@ -18,7 +18,7 @@ ffbuild_enabled() {
 ffbuild_dockerbuild() {
     local myconf=(
         PREFIX="$FFBUILD_PREFIX"
-        CXXSTDLIB_PCLIBSPRIVATE="-lstdc++"
+        CXXSTDLIB_PCLIBSPRIVATE="${FFBUILD_CXX_RUNTIME:--lstdc++}"
         VERBOSE=2
         STATIC_LIB=1
         SHARED_LIB=0
@@ -62,6 +62,8 @@ ffbuild_dockerbuild() {
             CONFIG=gcc
             TOOLCHAIN_PREFIX="$FFBUILD_CROSS_PREFIX"
         )
+    elif [[ $TARGET == macos* ]]; then
+        myconf+=( CONFIG=clang )
     else
         echo "Unknown target"
         return -1

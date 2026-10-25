@@ -22,7 +22,7 @@ ffbuild_dockerbuild() {
         myconf+=(
             --host="$FFBUILD_TOOLCHAIN"
         )
-    else
+    elif [[ $TARGET != macos* ]]; then
         echo "Unknown target"
         return -1
     fi

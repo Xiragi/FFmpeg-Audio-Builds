@@ -45,18 +45,40 @@ cat <<EOF >"$BUILD_SCRIPT"
         --extra-ldflags="\$FF_LDFLAGS" --extra-ldexeflags="\$FF_LDEXEFLAGS"'$RPATH_LDEXEFLAGS' \
         --cc="\$CC" --cxx="\$CXX" --ar="\$AR" --ranlib="\$RANLIB" --nm="\$NM" \
         --extra-version="\$(date +%Y%m%d)" || { cat ffbuild/config.log; exit 1; }
+    if [[ '$VARIANT' == lgpl-audio* ]] && grep -Eq '^#define CONFIG_(GPL|NONFREE) 1$' config.h; then
+        echo 'Refusing a GPL or nonfree audio build.' >&2
+        exit 1
+    fi
     make -j\$(nproc) V=1
     make install install-doc
+    if [[ '$VARIANT' == lgpl-audio* ]]; then
+        if [[ ! -d "\$FFBUILD_PREFIX/share/licenses" ]]; then
+            echo 'Audio dependency notices are missing. Rebuild the target image with makeimage.sh (leave buildOnly disabled in CI).' >&2
+            exit 1
+        fi
+        mkdir -p /ffbuild/prefix/share/licenses
+        cp -a "\$FFBUILD_PREFIX/share/licenses/." /ffbuild/prefix/share/licenses/
+    fi
 EOF
 
 [[ -t 1 ]] && TTY_ARG="-t" || TTY_ARG=""
 
 docker run --rm -i $TTY_ARG "${UIDARGS[@]}" -v "$PWD/ffbuild":/ffbuild -v "$BUILD_SCRIPT":/build.sh "$IMAGE" bash /build.sh
 
+audio_metadata() {
+    [[ $VARIANT == lgpl-audio* ]] || return 0
+    local output="$1"
+    mkdir -p "$output/build-info" "$output/licenses"
+    cp ffbuild/ffmpeg/config.h ffbuild/ffmpeg/config_components.h ffbuild/ffmpeg/ffbuild/config.mak "$output/build-info/"
+    git -C ffbuild/ffmpeg rev-parse HEAD > "$output/build-info/ffmpeg-commit.txt"
+    cp -a ffbuild/prefix/share/licenses/. "$output/licenses/"
+}
+
 if [[ -n "$FFBUILD_OUTPUT_DIR" ]]; then
     mkdir -p "$FFBUILD_OUTPUT_DIR"
     package_variant ffbuild/prefix "$FFBUILD_OUTPUT_DIR"
     [[ -n "$LICENSE_FILE" ]] && cp "ffbuild/ffmpeg/$LICENSE_FILE" "$FFBUILD_OUTPUT_DIR/LICENSE.txt"
+    audio_metadata "$FFBUILD_OUTPUT_DIR"
     rm -rf ffbuild
     exit 0
 fi
@@ -69,6 +91,7 @@ mkdir -p "ffbuild/pkgroot/$BUILD_NAME"
 package_variant ffbuild/prefix "ffbuild/pkgroot/$BUILD_NAME"
 
 [[ -n "$LICENSE_FILE" ]] && cp "ffbuild/ffmpeg/$LICENSE_FILE" "ffbuild/pkgroot/$BUILD_NAME/LICENSE.txt"
+audio_metadata "ffbuild/pkgroot/$BUILD_NAME"
 
 cd ffbuild/pkgroot
 if [[ "${TARGET}" == win* ]]; then

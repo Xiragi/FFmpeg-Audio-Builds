@@ -20,10 +20,21 @@ fi
 git config --global --add safe.directory "$PWD"
 
 source "$1"
+SOURCE_ROOT="$PWD"
 if [[ -z "$2" ]]; then
     ffbuild_dockerbuild
 else
     "$2"
+fi
+
+if [[ $VARIANT == lgpl-audio || $VARIANT == lgpl-audio-shared ]]; then
+    LICENSE_DIR="$FFBUILD_DESTPREFIX/share/licenses/$STAGENAME"
+    mkdir -p "$LICENSE_DIR"
+    (
+        cd "$SOURCE_ROOT"
+        find . -name .git -prune -o -type f \( -iname 'copying*' -o -iname 'license*' -o -iname 'copyright*' \) \
+            -exec cp --parents '{}' "$LICENSE_DIR/" \;
+    )
 fi
 
 if [[ -d "$FFBUILD_DESTDIR" ]]; then
