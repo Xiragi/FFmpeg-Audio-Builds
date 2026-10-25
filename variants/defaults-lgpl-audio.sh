@@ -4,8 +4,9 @@ AUDIO_DECODERS="aac,aac_latm,ac3,adpcm_*,alac,amrnb,amrwb,ape,aptx,aptx_hd,atrac
 AUDIO_MUXERS="ac3,adts,aiff,amr,asf,au,caf,chromaprint,dash,dts,eac3,flac,hls,iamf,ipod,latm,matroska,mov,mp2,mp3,mp4,null,ogg,opus,pcm_*,rtp,rtsp,spdif,truehd,tta,wav,wv"
 AUDIO_DEMUXERS="aac,ac3,adp,adx,aea,afc,aiff,amr,amrnb,amrwb,apc,ape,asf,au,avi,caf,concat,dash,daud,dsf,dss,dts,dtshd,dv,ea,eac3,flac,flv,gsm,hls,iamf,iff,ilbc,libgme,loas,lrc,matroska,mm,mmf,mov,mp3,mpc,mpc8,mpegps,mpegts,msf,mxf,nistsphere,nut,ogg,oma,pcm_*,qcp,rm,rsd,rso,rtp,rtsp,sbc,sbg,sds,sdx,shorten,siff,sln,sol,sox,spdif,svag,tak,truehd,tta,voc,vqf,w64,wav,wsaud,wsd,wtv,wv,xa,xmv,xvag,xwma"
 AUDIO_PARSERS="aac,aac_latm,ac3,amr,cook,dca,dvaudio,flac,g723_1,g729,gsm,mpegaudio,opus,sbc,vorbis"
-AUDIO_FILTERS="acompressor,acrossfade,adelay,aecho,afade,afir,aformat,agate,aiir,alimiter,aloop,amerge,amovie,anull,apad,aphaser,apulsator,aresample,asendcmd,asetnsamples,asetpts,asettb,ashowinfo,asplit,astats,asubboost,asubcut,asupercut,asuperpass,atempo,atrim,bass,chorus,compand,concat,ebur128,equalizer,flanger,loudnorm,pan,sidechaincompress,sidechaingate,silencedetect,silenceremove,treble,volume"
-AUDIO_PROTOCOLS="file,pipe,crypto,data,http,https,httpproxy,tcp,udp,rtp,srtp,tls,rtmp,rtmpe,rtmps,rtmpt,rtmpte"
+AUDIO_FILTERS="acompressor,acrossfade,adelay,aecho,afade,afir,aformat,agate,aiir,alimiter,aloop,amerge,amovie,anull,apad,aphaser,apulsator,aresample,asendcmd,asetnsamples,asetpts,asettb,ashowinfo,asplit,astats,asubboost,asubcut,asupercut,asuperpass,atempo,atrim,bass,channelmap,channelsplit,chorus,compand,concat,dynaudnorm,ebur128,equalizer,flanger,join,loudnorm,pan,replaygain,sidechaincompress,sidechaingate,silencedetect,silenceremove,treble,volume"
+AUDIO_BSFS="dca_core,eac3_core,truehd_core,opus_metadata"
+AUDIO_PROTOCOLS="file,fd,pipe,crypto,data,http,https,httpproxy,tcp,udp,rtp,srtp,tls,rtmp,rtmpe,rtmps,rtmpt,rtmpte"
 
 # Match upstream's disabled winarm64 OpenMPT recipe until that build is verified.
 if [[ $TARGET != winarm64 ]]; then
@@ -21,7 +22,7 @@ FF_CONFIGURE="--enable-version3 --disable-gpl --disable-nonfree \
     --enable-network --enable-protocol=$AUDIO_PROTOCOLS \
     --enable-encoder=$AUDIO_ENCODERS --enable-decoder=$AUDIO_DECODERS \
     --enable-muxer=$AUDIO_MUXERS --enable-demuxer=$AUDIO_DEMUXERS \
-    --enable-parser=$AUDIO_PARSERS --enable-filter=$AUDIO_FILTERS \
+    --enable-parser=$AUDIO_PARSERS --enable-filter=$AUDIO_FILTERS --enable-bsf=$AUDIO_BSFS \
     --enable-iconv --enable-zlib --enable-gmp --enable-lzma --enable-libxml2 \
     --enable-libmp3lame --enable-libopus --enable-libvorbis \
     --enable-libopencore-amrnb --enable-libopencore-amrwb \
