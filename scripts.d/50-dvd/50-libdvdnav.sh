@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_REPO="https://code.videolan.org/videolan/libdvdnav.git"
-SCRIPT_COMMIT="2ffc50b5c37a6ddc086829203fc44e95588198dd"
+SCRIPT_COMMIT="8147ccd35e5aae4afdd21171cf7b6b4d8f179d28"
 
 ffbuild_enabled() {
     [[ $VARIANT == lgpl* ]] && return -1
@@ -13,6 +13,11 @@ ffbuild_dockerbuild() {
     # stop the static library from exporting symbols when linked into a shared lib
     sed -i 's/SUPPORT_ATTRIBUTE_VISIBILITY_DEFAULT/SUPPORT_ATTRIBUTE_VISIBILITY_DEFAULT_DISABLED/g' meson.build
     sed -i 's/-DLIBDVDCSS_EXPORTS/-DLIBDVDCSS_EXPORTS_DISABLED/g' src/meson.build
+
+    # Build with the default bitfield layout like libdvdread, or the packed
+    # structs shared through its headers do not match on Windows.
+    # https://code.videolan.org/videolan/libdvdnav/-/merge_requests/64
+    sed -i "/'-mno-ms-bitfields'/d" meson.build
 
     mkdir build && cd build
 

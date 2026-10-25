@@ -21,8 +21,6 @@ ffbuild_depends() {
     echo chromaprint
     echo pulseaudio
     echo openal
-
-    echo rpath
 }
 
 ffbuild_enabled() {
