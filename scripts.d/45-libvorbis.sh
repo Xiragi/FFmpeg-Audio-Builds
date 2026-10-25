@@ -13,6 +13,9 @@ ffbuild_enabled() {
 }
 
 ffbuild_dockerbuild() {
+    if [[ $TARGET == macos* ]]; then
+        sed -i 's/ -force_cpusubtype_ALL//g' configure.ac
+    fi
     ./autogen.sh
 
     local myconf=(
